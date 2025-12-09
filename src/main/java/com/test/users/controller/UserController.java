@@ -9,6 +9,10 @@ import com.test.users.model.User;
 import com.test.users.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,9 +64,12 @@ public class UserController {
 
     @GetMapping(USERS)
     @ResponseStatus(HttpStatus.OK)
-    public List<UserResponseDTO> getUsers() {
-        return userMapper.toUserResponseDtoList(userService.getAllUsers());
+    public Page<UserResponseDTO> getUsers(
+            @PageableDefault(size = 5, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        return userService.getAllUsers(pageable)
+                .map(userMapper::toUserResponseDto);
     }
+
 
     @DeleteMapping(USER_BY_ID)
     @ResponseStatus(HttpStatus.OK)

@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -121,12 +125,13 @@ public class UserServiceImplTest {
 
     @Test
     void getAllUsers_success() {
-        when(userRepository.findAll()).thenReturn(List.of(user));
 
-        List<User> users = userService.getAllUsers();
+        Page<User> userPage = new PageImpl<>(List.of(user));
+        when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
+        Page<User> users = userService.getAllUsers(PageRequest.of(0, 10));
+        assertEquals(1, users.getTotalElements());
+        assertEquals(user, users.getContent().get(0));
 
-        assertEquals(1, users.size());
-        assertEquals(user, users.get(0));
     }
 
     @Test
