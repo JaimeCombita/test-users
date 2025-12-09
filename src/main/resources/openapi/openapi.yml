@@ -1,0 +1,244 @@
+openapi: 3.0.3
+info:
+  title: User Management API
+  version: 1.0.0
+  description: API RESTful para gestionar usuarios y teléfonos.
+
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+tags:
+  - name: Users
+    description: Operaciones sobre usuarios
+
+paths:
+  /api/v1/user:
+    post:
+      tags: [Users]
+      summary: Crear usuario
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequestDTO'
+            examples:
+              createUser:
+                value:
+                  name: Jaime
+                  email: jaime@test.com
+                  password: 123456
+                  identificationNumber: 123456
+                  phones:
+                    - number: "3001234567"
+                      cityCode: "1"
+                      countryCode: "57"
+      responses:
+        '201':
+          description: Usuario creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+    delete:
+      tags: [Users]
+      summary: Eliminar todos los usuarios
+      operationId: deleteAllUsers
+      responses:
+        '204':
+          description: Eliminados sin contenido
+
+  /api/v1/users:
+    get:
+      tags: [Users]
+      summary: Listar todos los usuarios
+      operationId: getUsers
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponseDTO'
+
+  /api/v1/user/{id}:
+    get:
+      tags: [Users]
+      summary: Obtener usuario por ID
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+        '404':
+          description: Usuario no encontrado
+    put:
+      tags: [Users]
+      summary: Actualizar parcialmente usuario (name, email, password, isActive)
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateDTO'
+            examples:
+              updateUser:
+                value:
+                  name: "Nuevo Nombre"
+                  email: "nuevo@test.com"
+                  password: "nuevaClaveSegura"
+                  isActive: true
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+        '404':
+          description: Usuario no encontrado
+    delete:
+      tags: [Users]
+      summary: Eliminar usuario por ID
+      operationId: deleteUserById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Eliminado sin contenido
+        '404':
+          description: Usuario no encontrado
+
+components:
+  schemas:
+    PhoneDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        number:
+          type: string
+          example: "3001234567"
+        cityCode:
+          type: string
+          example: "1"
+        countryCode:
+          type: string
+          example: "57"
+      required:
+        - number
+        - cityCode
+        - countryCode
+
+    UserRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        identificationNumber:
+          type: string
+          description: Número de identificación como cadena
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneDTO'
+      required:
+        - name
+        - email
+        - password
+        - identificationNumber
+
+    UserUpdateDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        password:
+          type: string
+          minLength: 6
+          nullable: true
+        isActive:
+          type: boolean
+          nullable: true
+      description: Actualización parcial. Solo se modifican campos presentes (no nulos).
+
+    UserResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        identificationNumber:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneDTO'
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        modified:
+          type: string
+          format: date-time
+          readOnly: true
+        lastLogin:
+          type: string
+          format: date-time
+          readOnly: true
+        token:
+          type: string
+          format: uuid
+          nullable: true
+        isActive:
+          type: boolean
+      required:
+        - id
+        - identificationNumber
+        - name
+        - email
+        - isActive

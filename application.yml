@@ -1,0 +1,9 @@
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  info:
+    title: User Management API
+    description: API RESTfull para gestión de usuarios y teléfonos
+    version: 1.0.0
