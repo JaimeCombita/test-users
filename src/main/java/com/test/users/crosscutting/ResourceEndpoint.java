@@ -1,0 +1,10 @@
+package com.test.users.crosscutting;
+
+public class ResourceEndpoint {
+
+    public static final String API_VERSION = "api/v1";
+    public static final String USER = "/user";
+    public static final String USERS = "/users";
+    public static final String USER_BY_ID = USER+"/{id}";
+    public static final String CONSUMES_TYPE_JSON = "application/json";
+}

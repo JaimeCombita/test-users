@@ -1,8 +1,13 @@
 package com.test.users.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,6 +17,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "USERS")
 @Builder(toBuilder = true)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements Serializable {
 
     @Id
@@ -19,6 +27,9 @@ public class User implements Serializable {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(updatable = false, nullable = false)
     private UUID id;
+
+    @Column(updatable = false, nullable = false, unique = true)
+    private String identificationNumber;
 
     @Column(nullable = false, length = 100)
     private String name;
@@ -30,6 +41,7 @@ public class User implements Serializable {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Phone> phones;
 
     @Column
@@ -37,9 +49,6 @@ public class User implements Serializable {
 
     @Column
     private LocalDateTime modified;
-
-    @Column
-    private LocalDateTime lastLogin;
 
     @Column
     private UUID token;
