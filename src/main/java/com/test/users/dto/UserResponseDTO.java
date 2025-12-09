@@ -21,7 +21,8 @@ public class UserResponseDTO {
     private List<PhoneDTO> phones;
     private LocalDateTime created;
     private LocalDateTime modified;
-    private UUID token;
+    private String token;
     private Boolean isActive;
+    private String password;
 
 }

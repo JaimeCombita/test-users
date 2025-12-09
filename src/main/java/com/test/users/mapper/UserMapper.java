@@ -37,6 +37,7 @@ public interface UserMapper {
     @Mapping(target = "identificationNumber", source = "identificationNumber")
     @Mapping(target = "name", source = "name")
     @Mapping(target = "phones", source = "phones")
+    @Mapping(target = "password", source = "password")
     UserResponseDTO toUserResponseDto(User user);
 
     List<UserResponseDTO> toUserResponseDtoList(List<User> user);

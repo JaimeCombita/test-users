@@ -51,7 +51,7 @@ public class User implements Serializable {
     private LocalDateTime modified;
 
     @Column
-    private UUID token;
+    private String token;
 
     @Column
     private Boolean isActive;

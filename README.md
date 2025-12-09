@@ -36,6 +36,20 @@ Relaciones:
 - `User` ↔ `Phone` → relación **OneToMany** con cascada y eliminación de huérfanos.
 
 ---
+## 📂 Estructura del Proyecto
+- test-users/
+    - src/
+        - main/
+            - java/com/example/users/
+                - controller/
+                - service/
+                - repository/
+                - model/
+            - resources/
+                - application.yml
+        - test/
+    - pom.xml
+    - README.md
 
 ## 📡 Endpoints
 

@@ -1,13 +1,14 @@
 package com.test.users.service.impl;
 
-import com.test.users.dto.UserRequestDTO;
 import com.test.users.dto.UserUpdateDTO;
 import com.test.users.exception.BadResourceRequestException;
 import com.test.users.exception.NoSuchResourceFoundException;
 import com.test.users.model.User;
 import com.test.users.repository.UserRepository;
 import com.test.users.service.UserService;
+import com.test.users.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtils jwtUtil;
+
     @Override
     public User createUser(User user) {
         Optional<User> existUser = userRepository.findByIdentificationNumber(user.getIdentificationNumber());
@@ -27,6 +34,11 @@ public class UserServiceImpl implements UserService {
         if(existUser.isPresent()){
             throw new BadResourceRequestException("User with same Identification Number exists.");
         }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        user.setToken(token);
 
         user.setIsActive(Boolean.TRUE);
         user.setCreated(LocalDateTime.now());
@@ -46,7 +58,7 @@ public class UserServiceImpl implements UserService {
             user.setEmail(userUpdateDTO.getEmail());
         }
         if (userUpdateDTO.getPassword() != null) {
-            user.setPassword(userUpdateDTO.getPassword());
+            user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
         }
         if (userUpdateDTO.getIsActive() != null) {
             user.setIsActive(userUpdateDTO.getIsActive());

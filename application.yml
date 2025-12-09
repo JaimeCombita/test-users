@@ -7,3 +7,7 @@ springdoc:
     title: User Management API
     description: API RESTfull para gestión de usuarios y teléfonos
     version: 1.0.0
+
+jwt:
+  secret: MiClaveSuperSecretaDeAlMenos32Caracteres123!
+  expiration: 3600000   # 1 hora en milisegundos
