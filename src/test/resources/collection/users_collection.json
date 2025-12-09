@@ -1,0 +1,134 @@
+{
+  "v": 11,
+  "name": "usersCollection",
+  "folders": [],
+  "requests": [
+    {
+      "v": "17",
+      "endpoint": "http://localhost:8080/api/v1/user",
+      "name": "CreateUser",
+      "params": [],
+      "headers": [],
+      "method": "POST",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"name\":\"Test 1\",\n  \"identificationNumber\":\"123451\",\n  \"email\":\"test1@email.com\",\n  \"password\":\"123456\",\n  \"phones\":[\n    {\n      \"number\":\"3216549877\",\n      \"cityCode\":\"123\",\n      \"countryCode\":\"57\"\n    }\n  ]\n}"
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "17",
+      "endpoint": "http://localhost:8080/api/v1/users?page=0",
+      "name": "ListUsers",
+      "params": [],
+      "headers": [],
+      "method": "GET",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "17",
+      "endpoint": "http://localhost:8080/api/v1/user/437fd22e-b78d-42dc-ae65-5068a1d91672",
+      "name": "GetUserById",
+      "params": [],
+      "headers": [],
+      "method": "GET",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "17",
+      "endpoint": "http://localhost:8080/api/v1/user/437fd22e-b78d-42dc-ae65-5068a1d91672",
+      "name": "UpdateUser",
+      "params": [],
+      "headers": [],
+      "method": "PUT",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"name\":\"Test 2\",\n  \"email\":\"test2@email.com\",\n  \"password\":\"123456\",\n  \"isActive\":true\n}"
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "17",
+      "endpoint": "http://localhost:8080/api/v1/user/{id}",
+      "name": "DeleteUserById",
+      "params": [],
+      "headers": [],
+      "method": "DELETE",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "17",
+      "endpoint": "http://localhost:8080/api/v1/users",
+      "name": "DeleteAllUsers",
+      "params": [],
+      "headers": [],
+      "method": "DELETE",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {}
+    }
+  ],
+  "headers": [],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "variables": [],
+  "description": ""
+}
