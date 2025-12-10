@@ -11,3 +11,22 @@ springdoc:
 jwt:
   secret: MiClaveSuperSecretaDeAlMenos32Caracteres123!
   expiration: 3600000   # 1 hora en milisegundos
+  refresh: 86400000   # 1 hora en milisegundos
+
+app:
+  admin:
+    email: admin@app.com
+    password: admin123
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, prometheus
+  endpoint:
+    health:
+      show-details: always
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0   # 100% de requests trazados (en producción puedes bajar este valor)

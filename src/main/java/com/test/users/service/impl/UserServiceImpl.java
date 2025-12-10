@@ -1,21 +1,25 @@
 package com.test.users.service.impl;
 
+import com.test.users.crosscutting.Role;
 import com.test.users.dto.UserUpdateDTO;
 import com.test.users.exception.BadResourceRequestException;
 import com.test.users.exception.NoSuchResourceFoundException;
 import com.test.users.model.User;
 import com.test.users.repository.UserRepository;
 import com.test.users.service.UserService;
-import com.test.users.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service("userService")
@@ -25,9 +29,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtils jwtUtil;
 
     @Override
     public User createUser(User user) {
@@ -39,9 +40,7 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
-        user.setToken(token);
-
+        user.setRoles(Set.of(Role.ROLE_USER));
         user.setIsActive(Boolean.TRUE);
         user.setCreated(LocalDateTime.now());
         user.setModified(LocalDateTime.now());
@@ -73,13 +72,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUserById(UUID id) {
-        Optional<User> user = userRepository.findById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new BadResourceRequestException("No user with given id found."));
 
-        if(user.isEmpty()){
-            throw new BadResourceRequestException("No user with given id found.");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserId = authentication.getName();
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !currentUserId.equals(id.toString())) {
+            throw new AccessDeniedException("You can only access your own information");
         }
-        
-        return user;
+
+        return Optional.ofNullable(user);
+
     }
 
     @Override

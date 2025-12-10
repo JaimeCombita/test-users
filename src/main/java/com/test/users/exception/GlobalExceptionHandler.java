@@ -43,6 +43,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), path, null);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadResource(BadCredentialsException ex, WebRequest request) {
+        String path = request.getDescription(false).replace("uri=", "");
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), path, null);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
         String path = request.getDescription(false).replace("uri=", "");

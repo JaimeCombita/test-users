@@ -15,8 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 import java.util.UUID;
 
 import static com.test.users.crosscutting.ResourceEndpoint.CONSUMES_TYPE_JSON;
@@ -35,6 +35,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = USER, consumes = CONSUMES_TYPE_JSON, produces = CONSUMES_TYPE_JSON)
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDTO createUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
@@ -43,6 +44,7 @@ public class UserController {
         return userMapper.toUserResponseDto(savedUser);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PutMapping(value = USER_BY_ID)
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponseDTO updateUser(
@@ -53,6 +55,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping(USER_BY_ID)
     @ResponseStatus(HttpStatus.OK)
     public UserResponseDTO getModelById(@PathVariable UUID id) {
@@ -62,6 +65,7 @@ public class UserController {
 
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USERS)
     @ResponseStatus(HttpStatus.OK)
     public Page<UserResponseDTO> getUsers(

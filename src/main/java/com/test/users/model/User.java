@@ -1,5 +1,6 @@
 package com.test.users.model;
 
+import com.test.users.crosscutting.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,9 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -55,5 +58,9 @@ public class User implements Serializable {
 
     @Column
     private Boolean isActive;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
 
 }

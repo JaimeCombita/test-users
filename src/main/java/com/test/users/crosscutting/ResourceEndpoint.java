@@ -7,4 +7,6 @@ public class ResourceEndpoint {
     public static final String USERS = "/users";
     public static final String USER_BY_ID = USER+"/{id}";
     public static final String CONSUMES_TYPE_JSON = "application/json";
+    public static final String AUTH = "/auth";
+    public static final String LOGIN = AUTH+"/login";
 }

@@ -1,5 +1,6 @@
 package com.test.users.mapper;
 
+import com.test.users.dto.LoginResponseDTO;
 import com.test.users.dto.PhoneDTO;
 import com.test.users.dto.UserRequestDTO;
 import com.test.users.dto.UserResponseDTO;
@@ -39,6 +40,13 @@ public interface UserMapper {
     @Mapping(target = "phones", source = "phones")
     @Mapping(target = "password", source = "password")
     UserResponseDTO toUserResponseDto(User user);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "identificationNumber", source = "identificationNumber")
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "phones", source = "phones")
+    @Mapping(target = "email", source = "email")
+    LoginResponseDTO toLoginResponseDto(User user);
 
     List<UserResponseDTO> toUserResponseDtoList(List<User> user);
 

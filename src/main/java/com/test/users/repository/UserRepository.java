@@ -1,5 +1,6 @@
 package com.test.users.repository;
 
+import com.test.users.crosscutting.Role;
 import com.test.users.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +14,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     void deleteUserById(UUID id);
 
     Optional<User> findByIdentificationNumber(String identificationNumber);
+
+    Optional<User> findByEmail(String email);
+
+    boolean existsByRolesContaining(Role role);
 }
