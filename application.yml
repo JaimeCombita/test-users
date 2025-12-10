@@ -27,6 +27,6 @@ management:
     health:
       show-details: always
   tracing:
-    enabled: true
+    enabled: false
     sampling:
       probability: 1.0   # 100% de requests trazados (en producción puedes bajar este valor)
