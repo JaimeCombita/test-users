@@ -1,5 +1,7 @@
 package com.company.users.service.impl;
 
+import com.company.users.crosscutting.Constants;
+import com.company.users.crosscutting.ErrorMessage;
 import com.company.users.crosscutting.Role;
 import com.company.users.dto.UserUpdateDTO;
 import com.company.users.exception.BadResourceRequestException;
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> existUser = userRepository.findByIdentificationNumber(user.getIdentificationNumber());
 
         if(existUser.isPresent()){
-            throw new BadResourceRequestException("User with same Identification Number exists.");
+            throw new BadResourceRequestException(ErrorMessage.USER_WITH_SAME_IDENTIFICATION_NUMBER.getMessage());
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -49,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(UUID id, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchResourceFoundException("User not found"));
+                .orElseThrow(() -> new NoSuchResourceFoundException(ErrorMessage.USER_NOT_FOUND.getMessage()));
 
         if (userUpdateDTO.getName() != null) {
             user.setName(userUpdateDTO.getName());
@@ -72,16 +74,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserById(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new BadResourceRequestException("No user with given id found."));
+                .orElseThrow(() -> new BadResourceRequestException(ErrorMessage.USER_NOT_FOUND.getMessage()));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserId = authentication.getName();
 
         boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(auth -> auth.getAuthority().equals(Constants.ROLE_ADMIN));
 
         if (!isAdmin && !currentUserId.equals(id.toString())) {
-            throw new AccessDeniedException("You can only access your own information");
+            throw new AccessDeniedException(ErrorMessage.CAN_ONLY_ACCESS_YOY_OWN_INFO.getMessage());
         }
 
         return Optional.ofNullable(user);

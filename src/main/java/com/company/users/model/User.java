@@ -31,7 +31,7 @@ public class User implements Serializable {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(updatable = false, nullable = false, unique = true)
+    @Column(name = "identification_number", updatable = false, nullable = false, unique = true)
     private String identificationNumber;
 
     @Column(nullable = false, length = 100)
@@ -53,11 +53,11 @@ public class User implements Serializable {
     @Column
     private LocalDateTime modified;
 
-    @Column
-    private String token;
-
-    @Column
+    @Column(name = "is_active")
     private Boolean isActive;
+
+    @Column(name = "allow_multisession")
+    private Boolean allowMultisession;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)

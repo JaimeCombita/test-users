@@ -46,7 +46,7 @@ public interface UserMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "phones", source = "phones")
     @Mapping(target = "email", source = "email")
-    LoginResponseDTO toLoginResponseDto(User user);
+    LoginResponseDTO toLoginResponseDto(User user, String accessToken);
 
     List<UserResponseDTO> toUserResponseDtoList(List<User> user);
 

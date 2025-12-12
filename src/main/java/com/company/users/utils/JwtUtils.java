@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -20,46 +21,41 @@ public class JwtUtils {
 
     private final JwtConfig jwtConfig;
 
-    @Value("${jwt.secret}")
-    private String secret;
-
-    @Value("${jwt.refresh}")
-    private long expiration;
-
-
     public JwtUtils(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }
 
-    public String generateRefreshToken(UUID userId, String email) {
+    public String generateRefreshToken(UUID userId, String email, Instant expirationInstant) {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("email", email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
+                .setExpiration(Date.from(expirationInstant))
                 .signWith(jwtConfig.getKey())
                 .compact();
     }
 
     public String generateAccessToken(UUID userId, String email, Set<Role> roles) {
         List<String> roleNames = roles.stream()
-                .map(Enum::name) // ROLE_ADMIN → "ROLE_ADMIN"
+                .map(Enum::name)
                 .toList();
+
+        Instant expirationInstant = Instant.now().plus(jwtConfig.getExpiration());
 
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("email", email)
                 .claim("roles", roleNames)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+                .setExpiration(Date.from(expirationInstant))
+                .signWith(jwtConfig.getKey())
                 .compact();
     }
 
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+                    .setSigningKey(jwtConfig.getKey())
                     .build()
                     .parseClaimsJws(token);
             return true;
@@ -70,7 +66,7 @@ public class JwtUtils {
 
     public Claims getClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+                .setSigningKey(jwtConfig.getKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

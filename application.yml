@@ -10,8 +10,8 @@ springdoc:
 
 jwt:
   secret: MiClaveSuperSecretaDeAlMenos32Caracteres123!
-  expiration: 3600000   # 1 hora en milisegundos
-  refresh: 86400000   # 1 hora en milisegundos
+  expiration: 1h
+  refresh: 7d
 
 app:
   admin:
