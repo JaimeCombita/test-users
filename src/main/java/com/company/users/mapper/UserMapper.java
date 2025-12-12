@@ -41,11 +41,12 @@ public interface UserMapper {
     @Mapping(target = "password", source = "password")
     UserResponseDTO toUserResponseDto(User user);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "identificationNumber", source = "identificationNumber")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "phones", source = "phones")
-    @Mapping(target = "email", source = "email")
+    @Mapping(source = "user.id", target = "id")
+    @Mapping(source = "accessToken", target = "token")
+    @Mapping(source = "user.identificationNumber", target = "identificationNumber")
+    @Mapping(source = "user.name", target = "name")
+    @Mapping(source = "user.phones", target = "phones")
+    @Mapping(source = "user.email", target = "email")
     LoginResponseDTO toLoginResponseDto(User user, String accessToken);
 
     List<UserResponseDTO> toUserResponseDtoList(List<User> user);
