@@ -1,5 +1,5 @@
 # === IntelliJ IDEA ===
-.idea/*
+.idea/compiler.xml
 *.iml
 *.iws
 out/
