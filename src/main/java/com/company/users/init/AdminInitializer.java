@@ -44,6 +44,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .isActive(Boolean.TRUE)
                     .created(LocalDateTime.now())
                     .modified(LocalDateTime.now())
+                    .allowMultisession(Boolean.FALSE)
                     .build();
             userRepository.save(admin);
             System.out.println("Initial User ADMIN Created: "+adminEmail);

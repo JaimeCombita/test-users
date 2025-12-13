@@ -35,7 +35,15 @@ public class RefreshToken {
     @Column(name = "is_revoked", nullable = false)
     private Boolean isRevoked;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
+
+    @PrePersist
+    public void prePersist() {
+        if (createdAt == null) {
+            createdAt = Instant.now();
+        }
+    }
 
 }

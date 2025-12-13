@@ -2,6 +2,8 @@ package com.company.users.exception;
 
 import com.company.users.crosscutting.ErrorCode;
 import com.company.users.crosscutting.ErrorMessage;
+import com.company.users.dto.ErrorResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,60 +23,68 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
-    private ResponseEntity<Object> buildResponse(ErrorCode errorCode, String path, Map<String, Object> extra) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", Instant.now().toString());
-        body.put("status", errorCode.getStatus().value());
-        body.put("error", errorCode.getStatus().getReasonPhrase());
-        body.put("message", errorCode.getMessage());
-        if (path != null) body.put("path", path);
-        if (extra != null && !extra.isEmpty()) body.putAll(extra);
+    private ResponseEntity<ErrorResponse> buildResponse(ErrorCode errorCode, String path, Map<String, Object> extra) {
+        ErrorResponse body = ErrorResponse.builder()
+                .timestamp(Instant.now())
+                .status(errorCode.getStatus().value())
+                .error(errorCode.getStatus().getReasonPhrase())
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .path(path)
+                .details(extra)
+                .build();
+
         return new ResponseEntity<>(body, errorCode.getStatus());
     }
 
-    @ExceptionHandler(NoSuchResourceFoundException.class)
-    public ResponseEntity<Object> handleNotFound(NoSuchResourceFoundException ex, WebRequest request) {
-        return buildResponse(ErrorCode.USER_NOT_FOUND, extractPath(request), null);
-    }
-
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Object> handleBadCredentials(BadCredentialsException ex, WebRequest request) {
-        return buildResponse(ErrorCode.INVALID_CREDENTIALS, extractPath(request), null);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Object> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
-        return buildResponse(ErrorCode.USER_NOT_ACTIVE, extractPath(request), null);
+    @ExceptionHandler({
+            NoSuchResourceFoundException.class,
+            BadCredentialsException.class,
+            AccessDeniedException.class,
+            HttpMessageNotReadableException.class,
+            InvalidDataAccessApiUsageException.class
+    })
+    public ResponseEntity<ErrorResponse> handleKnownExceptions(Exception ex, WebRequest request) {
+        ErrorCode errorCode = mapExceptionToErrorCode(ex);
+        Map<String, Object> extra = extractExtra(ex);
+        return buildResponse(errorCode, extractPath(request), extra);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
         List<Map<String, String>> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(err -> Map.of("field", err.getField(), "message", err.getDefaultMessage()))
                 .collect(Collectors.toList());
+
         Map<String, Object> extra = Map.of("validationErrors", errors);
         return buildResponse(ErrorCode.VALIDATION_FAILED, extractPath(request), extra);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleUnreadable(HttpMessageNotReadableException ex, WebRequest request) {
-        return buildResponse(ErrorCode.MALFORMED_JSON, extractPath(request), null);
-    }
-
-    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
-    public ResponseEntity<Object> handleInvalidDataAccess(InvalidDataAccessApiUsageException ex, WebRequest request) {
-        Map<String, Object> extra = Map.of("detail", ex.getMostSpecificCause().getMessage());
-        return buildResponse(ErrorCode.INVALID_DATA_ACCESS, extractPath(request), extra);
-    }
-
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleAll(Exception ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleAll(Exception ex, WebRequest request) {
         Map<String, Object> extra = Map.of("detail", ex.getMessage());
         return buildResponse(ErrorCode.INTERNAL_SERVER_ERROR, extractPath(request), extra);
+    }
+
+    private ErrorCode mapExceptionToErrorCode(Exception ex) {
+        if (ex instanceof NoSuchResourceFoundException) return ErrorCode.USER_NOT_FOUND;
+        if (ex instanceof BadCredentialsException) return ErrorCode.INVALID_CREDENTIALS;
+        if (ex instanceof AccessDeniedException) return ErrorCode.USER_NOT_ACTIVE;
+        if (ex instanceof HttpMessageNotReadableException) return ErrorCode.MALFORMED_JSON;
+        if (ex instanceof InvalidDataAccessApiUsageException) return ErrorCode.INVALID_DATA_ACCESS;
+        return ErrorCode.INTERNAL_SERVER_ERROR;
+    }
+
+    private Map<String, Object> extractExtra(Exception ex) {
+        if (ex instanceof InvalidDataAccessApiUsageException) {
+            return Map.of("detail", ((InvalidDataAccessApiUsageException) ex).getMostSpecificCause().getMessage());
+        }
+        return null;
     }
 
     private String extractPath(WebRequest request) {

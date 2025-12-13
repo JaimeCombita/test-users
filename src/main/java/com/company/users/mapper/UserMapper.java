@@ -1,5 +1,6 @@
 package com.company.users.mapper;
 
+import com.company.users.crosscutting.Role;
 import com.company.users.dto.LoginResponseDTO;
 import com.company.users.dto.PhoneDTO;
 import com.company.users.dto.UserRequestDTO;
@@ -11,10 +12,17 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+
+    @Mapping(source = "accessToken", target = "token")
+    @Mapping(source = "expiration", target = "expiration")
+    @Mapping(source = "user.roles", target = "rol")
+    LoginResponseDTO toLoginResponseDto(User user, String accessToken, Instant expiration);
 
     @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "identificationNumber", source = "identificationNumber")
@@ -41,14 +49,6 @@ public interface UserMapper {
     @Mapping(target = "password", source = "password")
     UserResponseDTO toUserResponseDto(User user);
 
-    @Mapping(source = "user.id", target = "id")
-    @Mapping(source = "accessToken", target = "token")
-    @Mapping(source = "user.identificationNumber", target = "identificationNumber")
-    @Mapping(source = "user.name", target = "name")
-    @Mapping(source = "user.phones", target = "phones")
-    @Mapping(source = "user.email", target = "email")
-    LoginResponseDTO toLoginResponseDto(User user, String accessToken);
-
     List<UserResponseDTO> toUserResponseDtoList(List<User> user);
 
     @AfterMapping
@@ -58,5 +58,10 @@ public interface UserMapper {
         }
     }
 
+    default String map(Set<Role> roles) {
+        return roles != null && !roles.isEmpty()
+                ? roles.iterator().next().name()   // toma el único rol
+                : null;
+    }
 
 }

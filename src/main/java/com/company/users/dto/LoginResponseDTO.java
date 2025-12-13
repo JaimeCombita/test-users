@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,5 +19,9 @@ public class LoginResponseDTO {
     private String name;
     private String email;
     private List<PhoneDTO> phones;
+    private Boolean isActive;
+    private Boolean allowMultisession;
+    private String rol;
     private String token;
+    private Instant expiration;
 }
