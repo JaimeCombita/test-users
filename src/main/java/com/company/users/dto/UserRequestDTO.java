@@ -37,4 +37,6 @@ public class UserRequestDTO {
 
     private List<PhoneDTO> phones;
 
+    private Boolean allowMultisession;
+
 }

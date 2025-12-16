@@ -1,7 +1,8 @@
 package com.company.users.crosscutting;
 
-public enum Role {
+public enum Roles {
     ROLE_ADMIN,
     ROLE_USER,
-    ROLE_GUEST
+    ROLE_GUEST,
+    ROLE_ROOT
 }

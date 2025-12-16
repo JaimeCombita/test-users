@@ -1,6 +1,6 @@
 package com.company.users.repository;
 
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import com.company.users.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,5 +17,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByEmail(String email);
 
-    boolean existsByRolesContaining(Role role);
+    boolean existsByRolesContaining(Roles role);
 }

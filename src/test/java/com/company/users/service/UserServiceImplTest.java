@@ -1,6 +1,6 @@
 package com.company.users.service;
 
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import com.company.users.dto.UserUpdateDTO;
 import com.company.users.exception.BadResourceRequestException;
 import com.company.users.exception.NoSuchResourceFoundException;
@@ -52,7 +52,7 @@ public class UserServiceImplTest {
         user.setIdentificationNumber("12345");
         user.setEmail("test@test.com");
         user.setPassword("plainPassword");
-        user.setRoles(Set.of(Role.ROLE_ADMIN));
+        user.setRoles(Set.of(Roles.ROLE_ADMIN));
     }
 
     @Test

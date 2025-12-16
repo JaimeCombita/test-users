@@ -1,6 +1,6 @@
 package com.company.users.model;
 
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,6 +61,6 @@ public class User implements Serializable {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles = new HashSet<>();
+    private Set<Roles> roles = new HashSet<>();
 
 }

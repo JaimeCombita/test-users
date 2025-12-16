@@ -8,6 +8,7 @@ import com.company.users.mapper.UserMapper;
 import com.company.users.model.User;
 import com.company.users.service.UserService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,63 +28,54 @@ import static com.company.users.crosscutting.ResourceEndpoint.API_VERSION;
 
 @RestController
 @RequestMapping(API_VERSION)
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UserService userService;
+    private final UserMapper userMapper;
+    private final UserService userService;
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(value = USER, consumes = CONSUMES_TYPE_JSON, produces = CONSUMES_TYPE_JSON)
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDTO createUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid UserRequestDTO userRequestDTO) {
         User user = userMapper.toEntity(userRequestDTO);
         User savedUser = userService.createUser(user);
-        return userMapper.toUserResponseDto(savedUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toUserResponseDto(savedUser));
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @PutMapping(value = USER_BY_ID)
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDTO updateUser(
+    public ResponseEntity<UserResponseDTO> updateUser(
             @PathVariable UUID id,
             @RequestBody @Valid UserUpdateDTO userUpdateDTO) {
         User updatedUser = userService.updateUser(id, userUpdateDTO);
-        return userMapper.toUserResponseDto(updatedUser);
-
+        return ResponseEntity.ok(userMapper.toUserResponseDto(updatedUser));
     }
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping(USER_BY_ID)
-    @ResponseStatus(HttpStatus.OK)
-    public UserResponseDTO getModelById(@PathVariable UUID id) {
+    public ResponseEntity<UserResponseDTO> getModelById(@PathVariable UUID id) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new NoSuchResourceFoundException("No user with given id found."));
-        return userMapper.toUserResponseDto(user);
-
+        return ResponseEntity.ok(userMapper.toUserResponseDto(user));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping(USERS)
-    @ResponseStatus(HttpStatus.OK)
-    public Page<UserResponseDTO> getUsers(
+    public ResponseEntity<Page<UserResponseDTO>> getUsers(
             @PageableDefault(size = 5, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
-        return userService.getAllUsers(pageable)
-                .map(userMapper::toUserResponseDto);
+        return ResponseEntity.ok(userService.getAllUsers(pageable)
+                .map(userMapper::toUserResponseDto));
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(USER_BY_ID)
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> deleteUserById(@PathVariable UUID id) {
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(USERS)
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Void> deleteAllUsers() {
         userService.deleteAllUsers();
         return ResponseEntity.noContent().build();

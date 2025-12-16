@@ -21,8 +21,7 @@ public class UserResponseDTO {
     private List<PhoneDTO> phones;
     private LocalDateTime created;
     private LocalDateTime modified;
-    private String token;
     private Boolean isActive;
-    private String password;
-
+    private Boolean allowMultisession;
+    private String rol;
 }

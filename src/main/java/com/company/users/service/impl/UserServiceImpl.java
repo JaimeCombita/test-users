@@ -2,7 +2,7 @@ package com.company.users.service.impl;
 
 import com.company.users.crosscutting.Constants;
 import com.company.users.crosscutting.ErrorMessage;
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import com.company.users.dto.UserUpdateDTO;
 import com.company.users.exception.BadResourceRequestException;
 import com.company.users.exception.NoSuchResourceFoundException;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        user.setRoles(Set.of(Role.ROLE_USER));
+        user.setRoles(Set.of(Roles.ROLE_USER));
         user.setIsActive(Boolean.TRUE);
         user.setCreated(LocalDateTime.now());
         user.setModified(LocalDateTime.now());

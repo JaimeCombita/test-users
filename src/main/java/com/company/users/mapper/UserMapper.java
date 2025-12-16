@@ -1,6 +1,6 @@
 package com.company.users.mapper;
 
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import com.company.users.dto.LoginResponseDTO;
 import com.company.users.dto.PhoneDTO;
 import com.company.users.dto.UserRequestDTO;
@@ -25,11 +25,12 @@ public interface UserMapper {
     LoginResponseDTO toLoginResponseDto(User user, String accessToken, Instant expiration);
 
     @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
-    @Mapping(target = "identificationNumber", source = "identificationNumber")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "password", source = "password")
-    @Mapping(target = "phones", source = "phones")
     User toEntity(UserRequestDTO dto);
+
+    @Mapping(source = "user.roles", target = "rol")
+    UserResponseDTO toUserResponseDto(User user);
+
+    //depurado hasta aqui
 
     @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
     @Mapping(target = "user", ignore = true)
@@ -42,13 +43,6 @@ public interface UserMapper {
     @Mapping(target = "phones", source = "phones")
     UserRequestDTO toUserRequestDto(User user);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "identificationNumber", source = "identificationNumber")
-    @Mapping(target = "name", source = "name")
-    @Mapping(target = "phones", source = "phones")
-    @Mapping(target = "password", source = "password")
-    UserResponseDTO toUserResponseDto(User user);
-
     List<UserResponseDTO> toUserResponseDtoList(List<User> user);
 
     @AfterMapping
@@ -58,9 +52,9 @@ public interface UserMapper {
         }
     }
 
-    default String map(Set<Role> roles) {
+    default String map(Set<Roles> roles) {
         return roles != null && !roles.isEmpty()
-                ? roles.iterator().next().name()   // toma el único rol
+                ? roles.iterator().next().name()
                 : null;
     }
 

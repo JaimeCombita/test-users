@@ -1,6 +1,6 @@
 package com.company.users.init;
 
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import com.company.users.model.User;
 import com.company.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class AdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args){
-        boolean existsAdmin = userRepository.existsByRolesContaining(Role.ROLE_ADMIN);
+        boolean existsAdmin = userRepository.existsByRolesContaining(Roles.ROLE_ADMIN);
 
         if(!existsAdmin){
 
@@ -40,7 +40,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .identificationNumber("987654321")
                     .email(adminEmail)
                     .password(passwordEncoder.encode(adminPassword))
-                    .roles(Set.of(Role.ROLE_ADMIN))
+                    .roles(Set.of(Roles.ROLE_ADMIN))
                     .isActive(Boolean.TRUE)
                     .created(LocalDateTime.now())
                     .modified(LocalDateTime.now())

@@ -1,13 +1,10 @@
 package com.company.users.utils;
 
 import com.company.users.configuration.JwtConfig;
-import com.company.users.crosscutting.Role;
+import com.company.users.crosscutting.Roles;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -35,7 +32,7 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String generateAccessToken(UUID userId, String email, Set<Role> roles, Instant expirationInstant) {
+    public String generateAccessToken(UUID userId, String email, Set<Roles> roles, Instant expirationInstant) {
         List<String> roleNames = roles.stream()
                 .map(Enum::name)
                 .toList();

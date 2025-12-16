@@ -34,5 +34,4 @@ public class Phone {
     @ToString.Exclude
     private User user;
 
-
 }
