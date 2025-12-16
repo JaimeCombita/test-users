@@ -112,7 +112,7 @@ public class AuthServiceImpl implements AuthService {
         Instant instant = Instant.now();
 
         Instant accessTokenExpiration = instant.plus(jwtConfig.getExpiration());
-        String newAccessToken = jwtUtil.generateAccessToken(user.getId(), user.getEmail(), user.getRoles(), accessTokenExpiration);
+        String newAccessToken = jwtUtil.generateAccessToken(user.getId(), user.getEmail(), user.getRol().toString(), accessTokenExpiration);
 
         Instant refreshExpiration = instant.plus(jwtConfig.getRefresh());
         String newRefreshToken = saveRefreshToken(user, refreshExpiration);

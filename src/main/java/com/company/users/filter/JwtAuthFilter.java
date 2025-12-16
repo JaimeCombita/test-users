@@ -38,13 +38,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(token)) {
                 Claims claims = jwtUtil.getClaims(token);
 
-                // Recuperar roles como List<String>
-                List<String> roles = claims.get("roles", List.class);
+                String role = claims.get("rol", String.class);
 
-                Collection<? extends GrantedAuthority> authorities = roles.stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .toList();
-
+                Collection<? extends GrantedAuthority> authorities =
+                        List.of(new SimpleGrantedAuthority(role));
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -55,6 +52,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-
 
 }

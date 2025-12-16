@@ -30,7 +30,7 @@ public class AdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args){
-        boolean existsAdmin = userRepository.existsByRolesContaining(Roles.ROLE_ADMIN);
+        boolean existsAdmin = userRepository.existsByRol(Roles.ROLE_ADMIN);
 
         if(!existsAdmin){
 
@@ -40,7 +40,7 @@ public class AdminInitializer implements CommandLineRunner {
                     .identificationNumber("987654321")
                     .email(adminEmail)
                     .password(passwordEncoder.encode(adminPassword))
-                    .roles(Set.of(Roles.ROLE_ADMIN))
+                    .rol(Roles.ROLE_ADMIN)
                     .isActive(Boolean.TRUE)
                     .created(LocalDateTime.now())
                     .modified(LocalDateTime.now())

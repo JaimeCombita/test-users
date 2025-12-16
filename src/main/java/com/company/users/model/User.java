@@ -59,8 +59,8 @@ public class User implements Serializable {
     @Column(name = "allow_multisession")
     private Boolean allowMultisession;
 
-    @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<Roles> roles = new HashSet<>();
+    @Column(nullable = false)
+    private Roles rol;
 
 }

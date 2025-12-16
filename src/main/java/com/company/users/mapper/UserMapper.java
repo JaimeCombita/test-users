@@ -21,13 +21,13 @@ public interface UserMapper {
 
     @Mapping(source = "accessToken", target = "token")
     @Mapping(source = "expiration", target = "expiration")
-    @Mapping(source = "user.roles", target = "rol")
+    @Mapping(source = "user.rol", target = "rol")
     LoginResponseDTO toLoginResponseDto(User user, String accessToken, Instant expiration);
 
     @Mapping(target = "id", expression = "java(java.util.UUID.randomUUID())")
     User toEntity(UserRequestDTO dto);
 
-    @Mapping(source = "user.roles", target = "rol")
+    @Mapping(source = "user.rol", target = "rol")
     UserResponseDTO toUserResponseDto(User user);
 
     //depurado hasta aqui

@@ -9,7 +9,7 @@ import com.company.users.exception.NoSuchResourceFoundException;
 import com.company.users.model.User;
 import com.company.users.repository.UserRepository;
 import com.company.users.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,31 +20,29 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service("userService")
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public User createUser(User user) {
-        Optional<User> existUser = userRepository.findByIdentificationNumber(user.getIdentificationNumber());
 
-        if(existUser.isPresent()){
+        if (userRepository.existsByIdentificationNumber(user.getIdentificationNumber())) {
             throw new BadResourceRequestException(ErrorMessage.USER_WITH_SAME_IDENTIFICATION_NUMBER.getMessage());
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        LocalDateTime now = LocalDateTime.now();
 
-        user.setRoles(Set.of(Roles.ROLE_USER));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRol(Roles.ROLE_USER);
         user.setIsActive(Boolean.TRUE);
-        user.setCreated(LocalDateTime.now());
-        user.setModified(LocalDateTime.now());
+        user.setCreated(now);
+        user.setModified(now);
         return userRepository.save(user);
     }
 
@@ -59,11 +57,14 @@ public class UserServiceImpl implements UserService {
         if (userUpdateDTO.getEmail() != null) {
             user.setEmail(userUpdateDTO.getEmail());
         }
-        if (userUpdateDTO.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
-        }
         if (userUpdateDTO.getIsActive() != null) {
             user.setIsActive(userUpdateDTO.getIsActive());
+        }
+        if (userUpdateDTO.getAllowMultisession() != null) {
+            user.setAllowMultisession(userUpdateDTO.getAllowMultisession());
+        }
+        if (userUpdateDTO.getRol() != null) {
+            user.setRol(userUpdateDTO.getRol());
         }
         user.setModified(LocalDateTime.now());
 

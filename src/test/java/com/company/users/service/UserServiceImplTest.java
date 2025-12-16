@@ -22,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -52,14 +51,14 @@ public class UserServiceImplTest {
         user.setIdentificationNumber("12345");
         user.setEmail("test@test.com");
         user.setPassword("plainPassword");
-        user.setRoles(Set.of(Roles.ROLE_ADMIN));
+        user.setRol(Roles.ROLE_ADMIN);
     }
 
     @Test
     void createUser_success() {
         when(userRepository.findByIdentificationNumber("12345")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("plainPassword")).thenReturn("hashedPassword");
-        when(jwtUtil.generateAccessToken(user.getId(), user.getEmail(), user.getRoles(), Instant.now())).thenReturn("jwtToken");
+        when(jwtUtil.generateAccessToken(user.getId(), user.getEmail(), String.valueOf(user.getRol()), Instant.now())).thenReturn("jwtToken");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         User created = userService.createUser(user);

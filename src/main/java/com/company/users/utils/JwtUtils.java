@@ -32,15 +32,11 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String generateAccessToken(UUID userId, String email, Set<Roles> roles, Instant expirationInstant) {
-        List<String> roleNames = roles.stream()
-                .map(Enum::name)
-                .toList();
-
+    public String generateAccessToken(UUID userId, String email, String rol, Instant expirationInstant) {
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("email", email)
-                .claim("roles", roleNames)
+                .claim("rol", rol)
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(expirationInstant))
                 .signWith(jwtConfig.getKey())
