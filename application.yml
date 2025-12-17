@@ -15,7 +15,7 @@ jwt:
 
 app:
   admin:
-    email: admin@app.com
+    email: leonardo.102408@gmail.com
     password: admin123
 
 management:
@@ -40,3 +40,17 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+  mail:
+    #host: smtp.office365.com
+    host: smtp.gmail.com
+    port: 587
+    #username: leonardo.102408@hotmail.com
+    #password: SamuGaby2008**
+    username: leonardo.102408@gmail.com
+    password: SiFaSaGa820*.-.*
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

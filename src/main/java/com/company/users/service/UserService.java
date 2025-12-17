@@ -1,6 +1,7 @@
 package com.company.users.service;
 
 import com.company.users.crosscutting.Roles;
+import com.company.users.dto.ChangePasswordDTO;
 import com.company.users.dto.UserRequestDTO;
 import com.company.users.dto.UserResponseDTO;
 import com.company.users.dto.UserUpdateDTO;
@@ -31,5 +32,11 @@ public interface UserService {
     void deleteUserById(UUID id);
 
     void deleteAllUsers();
+
+    void changePassword(UUID id, ChangePasswordDTO changePasswordDTO);
+
+    void initiatePasswordRecovery(String email);
+
+    void completePasswordRecovery(String token, String newPassword);
 
 }

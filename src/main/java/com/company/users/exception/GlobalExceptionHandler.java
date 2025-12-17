@@ -45,7 +45,8 @@ public class GlobalExceptionHandler {
             BadCredentialsException.class,
             AccessDeniedException.class,
             HttpMessageNotReadableException.class,
-            InvalidDataAccessApiUsageException.class
+            InvalidDataAccessApiUsageException.class,
+            RecoveryTokenException.class
     })
     public ResponseEntity<ErrorResponse> handleKnownExceptions(Exception ex, WebRequest request) {
         ErrorCode errorCode = mapExceptionToErrorCode(ex);

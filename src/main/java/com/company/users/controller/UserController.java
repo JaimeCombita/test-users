@@ -1,6 +1,7 @@
 package com.company.users.controller;
 
 import com.company.users.crosscutting.Roles;
+import com.company.users.dto.ChangePasswordDTO;
 import com.company.users.dto.UserRequestDTO;
 import com.company.users.dto.UserResponseDTO;
 import com.company.users.dto.UserUpdateDTO;
@@ -20,11 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static com.company.users.crosscutting.ResourceEndpoint.CONSUMES_TYPE_JSON;
-import static com.company.users.crosscutting.ResourceEndpoint.USER;
-import static com.company.users.crosscutting.ResourceEndpoint.USERS;
-import static com.company.users.crosscutting.ResourceEndpoint.USER_BY_ID;
-import static com.company.users.crosscutting.ResourceEndpoint.API_VERSION;
+import static com.company.users.crosscutting.ResourceEndpoint.*;
 
 @RestController
 @RequestMapping(API_VERSION)
@@ -85,6 +82,33 @@ public class UserController {
     public ResponseEntity<Void> deleteAllUsers() {
         userService.deleteAllUsers();
         return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping(CHANGE_PASSWORD)
+    public ResponseEntity<Void> changePassword(
+            @PathVariable("id") UUID id,
+            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(id, changePasswordDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping(INIT_RESET_PASSWORD)
+    public ResponseEntity<Void> initResetPassword(
+            @PathVariable("id") UUID id,
+            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(id, changePasswordDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping(COMPLETE_RESET_PASSWORD)
+    public ResponseEntity<Void> completeResetPassword(
+            @PathVariable("id") UUID id,
+            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
+        userService.changePassword(id, changePasswordDTO);
+        return ResponseEntity.ok().build();
     }
 
 }

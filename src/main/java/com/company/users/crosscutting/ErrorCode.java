@@ -12,7 +12,9 @@ public enum ErrorCode {
     MALFORMED_JSON(HttpStatus.BAD_REQUEST, "E005", "Malformed JSON request"),
     INVALID_DATA_ACCESS(HttpStatus.BAD_REQUEST, "E006", "Invalid data access"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E007", "Internal server error"),
-    REFRESH_TOKEN_NOT_FOUND_IN_COOKIE(HttpStatus.FORBIDDEN, "E008", "Refresh token not found in the cookie");
+    REFRESH_TOKEN_NOT_FOUND_IN_COOKIE(HttpStatus.FORBIDDEN, "E008", "Refresh token not found in the cookie"),
+    RECOVERY_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "E009", "Recovery token not found"),
+    RECOVERY_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "E010", "Recovery token expired");
 
     private final HttpStatus status;
     private final String code;
