@@ -1,22 +1,32 @@
 package com.company.users.service;
 
+import com.company.users.crosscutting.Roles;
+import com.company.users.dto.UserRequestDTO;
+import com.company.users.dto.UserResponseDTO;
 import com.company.users.dto.UserUpdateDTO;
-import com.company.users.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface UserService {
 
-    User createUser(User user);
+    UserResponseDTO createUser(UserRequestDTO userDto);
 
-    User updateUser(UUID id, UserUpdateDTO userUpdateDTO);
+    UserResponseDTO updateUser(UUID id, UserUpdateDTO userUpdateDTO);
 
-    Optional<User> getUserById(UUID id);
+    UserResponseDTO getUserById(UUID id);
 
-    Page<User> getAllUsers(Pageable pageable);
+    Page<UserResponseDTO> getAllUsers(Pageable pageable,
+                                      String name,
+                                      String email,
+                                      Boolean isActive,
+                                      Roles role,
+                                      LocalDateTime createdFrom,
+                                      LocalDateTime createdTo,
+                                      LocalDateTime modifiedFrom,
+                                      LocalDateTime modifiedTo);
 
     void deleteUserById(UUID id);
 

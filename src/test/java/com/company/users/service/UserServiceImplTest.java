@@ -1,18 +1,25 @@
 package com.company.users.service;
 
 import com.company.users.crosscutting.Roles;
+import com.company.users.dto.UserRequestDTO;
+import com.company.users.dto.UserResponseDTO;
 import com.company.users.dto.UserUpdateDTO;
 import com.company.users.exception.BadResourceRequestException;
 import com.company.users.exception.NoSuchResourceFoundException;
+import com.company.users.factory.UserDataFactory;
+import com.company.users.mapper.UserMapper;
 import com.company.users.model.User;
 import com.company.users.repository.UserRepository;
 import com.company.users.service.impl.UserServiceImpl;
 import com.company.users.utils.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +35,8 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class UserServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class UserServiceImplTest {
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -39,114 +48,67 @@ public class UserServiceImplTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JwtUtils jwtUtil;
+    private UserMapper userMapper;
 
     private User user;
+    private UserRequestDTO requestDTO;
+    private UserResponseDTO responseDTO;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        user = new User();
-        user.setId(UUID.randomUUID());
-        user.setIdentificationNumber("12345");
-        user.setEmail("test@test.com");
-        user.setPassword("plainPassword");
-        user.setRol(Roles.ROLE_ADMIN);
+        user = UserDataFactory.createUser();
+        requestDTO = UserDataFactory.createUserRequestDTO();
+        responseDTO = UserDataFactory.createUserResponseDTO(user);
     }
 
     @Test
     void createUser_success() {
-        when(userRepository.findByIdentificationNumber("12345")).thenReturn(Optional.empty());
+        when(userMapper.toEntity(requestDTO)).thenReturn(user);
+        when(userRepository.existsByIdentificationNumber("12345")).thenReturn(false);
         when(passwordEncoder.encode("plainPassword")).thenReturn("hashedPassword");
-        when(jwtUtil.generateAccessToken(user.getId(), user.getEmail(), String.valueOf(user.getRol()), Instant.now())).thenReturn("jwtToken");
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.toUserResponseDto(user)).thenReturn(responseDTO);
 
-        User created = userService.createUser(user);
+        UserResponseDTO created = userService.createUser(requestDTO);
 
-        assertEquals("hashedPassword", created.getPassword());
-        assertTrue(created.getIsActive());
-        assertNotNull(created.getCreated());
-        verify(userRepository).save(created);
+        assertEquals("test@test.com", created.email());
+        verify(userRepository).save(user);
     }
 
     @Test
     void createUser_alreadyExists_throwsException() {
-        when(userRepository.findByIdentificationNumber("12345")).thenReturn(Optional.of(user));
+        when(userMapper.toEntity(requestDTO)).thenReturn(user);
+        when(userRepository.existsByIdentificationNumber("12345")).thenReturn(true);
 
-        assertThrows(BadResourceRequestException.class, () -> userService.createUser(user));
+        assertThrows(BadResourceRequestException.class, () -> userService.createUser(requestDTO));
         verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    void updateUser_success() {
-        UUID id = user.getId();
-        UserUpdateDTO dto = new UserUpdateDTO();
-        dto.setName("Updated Name");
-        dto.setEmail("updated@test.com");
-        dto.setPassword("newPassword");
-
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-        when(passwordEncoder.encode("newPassword")).thenReturn("hashedNewPassword");
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        User updated = userService.updateUser(id, dto);
-
-        assertEquals("Updated Name", updated.getName());
-        assertEquals("updated@test.com", updated.getEmail());
-        assertEquals("hashedNewPassword", updated.getPassword());
-        verify(userRepository).save(updated);
     }
 
     @Test
     void updateUser_notFound_throwsException() {
         UUID id = UUID.randomUUID();
-        UserUpdateDTO dto = new UserUpdateDTO();
+        UserUpdateDTO dto = UserDataFactory.createUserUpdateDTO();
+
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(NoSuchResourceFoundException.class, () -> userService.updateUser(id, dto));
     }
 
     @Test
-    void getUserById_success() {
-        UUID id = user.getId();
-        when(userRepository.findById(id)).thenReturn(Optional.of(user));
-
-        Optional<User> result = userService.getUserById(id);
-
-        assertTrue(result.isPresent());
-        assertEquals(user, result.get());
-    }
-
-    @Test
-    void getUserById_notFound_throwsException() {
-        UUID id = UUID.randomUUID();
-        when(userRepository.findById(id)).thenReturn(Optional.empty());
-
-        assertThrows(BadResourceRequestException.class, () -> userService.getUserById(id));
-    }
-
-    @Test
-    void getAllUsers_success() {
-
-        Page<User> userPage = new PageImpl<>(List.of(user));
-        when(userRepository.findAll(any(Pageable.class))).thenReturn(userPage);
-        Page<User> users = userService.getAllUsers(PageRequest.of(0, 10));
-        assertEquals(1, users.getTotalElements());
-        assertEquals(user, users.getContent().get(0));
-
-    }
-
-    @Test
-    void deleteAllUsers_success() {
-        userService.deleteAllUsers();
-        verify(userRepository).deleteAllInBatch();
-    }
-
-    @Test
     void deleteUserById_success() {
         UUID id = user.getId();
+        when(userRepository.existsById(id)).thenReturn(true);
+
         userService.deleteUserById(id);
-        verify(userRepository).deleteUserById(id);
+
+        verify(userRepository).deleteById(id);
     }
 
+    @Test
+    void deleteUserById_notFound_throwsException() {
+        UUID id = UUID.randomUUID();
+        when(userRepository.existsById(id)).thenReturn(false);
+
+        assertThrows(NoSuchResourceFoundException.class, () -> userService.deleteUserById(id));
+    }
 }

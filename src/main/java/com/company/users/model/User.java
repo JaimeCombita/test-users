@@ -9,12 +9,13 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class User implements Serializable {
 
     @Id
@@ -47,10 +49,11 @@ public class User implements Serializable {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Phone> phones;
 
-    @Column
+    @CreatedDate
+    @Column(updatable = false)
     private LocalDateTime created;
 
-    @Column
+    @LastModifiedDate
     private LocalDateTime modified;
 
     @Column(name = "is_active")

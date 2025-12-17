@@ -1,27 +1,20 @@
 package com.company.users.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.company.users.crosscutting.Roles;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class UserResponseDTO {
-    private UUID id;
-    private Integer identificationNumber;
-    private String name;
-    private String email;
-    private List<PhoneDTO> phones;
-    private LocalDateTime created;
-    private LocalDateTime modified;
-    private Boolean isActive;
-    private Boolean allowMultisession;
-    private String rol;
-}
+public record UserResponseDTO(
+        UUID id,
+        String identificationNumber,
+        String name,
+        String email,
+        List<PhoneDTO> phones,
+        LocalDateTime created,
+        LocalDateTime modified,
+        Boolean isActive,
+        Boolean allowMultisession,
+        Roles rol
+) {}

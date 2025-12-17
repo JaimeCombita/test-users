@@ -37,7 +37,7 @@ public class AuthController {
 
     }
 
-    @PostMapping(value = REFRESH_TOKEN, consumes = CONSUMES_TYPE_JSON, produces = CONSUMES_TYPE_JSON)
+    @PostMapping(value = REFRESH_TOKEN, produces = CONSUMES_TYPE_JSON)
     public ResponseEntity<LoginResponseDTO> tokenRefresh(@CookieValue(value = "refreshToken", required = false) String refreshTokenRaw,
                                                   HttpServletResponse response) {
         if (refreshTokenRaw == null) {
@@ -56,7 +56,7 @@ public class AuthController {
             @CookieValue(value = "refreshToken", required = false) String refreshTokenRaw,
             HttpServletResponse response) {
         authService.logout(refreshTokenRaw, response);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
 

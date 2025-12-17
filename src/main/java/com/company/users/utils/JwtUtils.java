@@ -22,16 +22,6 @@ public class JwtUtils {
         this.jwtConfig = jwtConfig;
     }
 
-    public String generateRefreshToken(UUID userId, String email, Instant expirationInstant) {
-        return Jwts.builder()
-                .setSubject(userId.toString())
-                .claim("email", email)
-                .setIssuedAt(new Date())
-                .setExpiration(Date.from(expirationInstant))
-                .signWith(jwtConfig.getKey())
-                .compact();
-    }
-
     public String generateAccessToken(UUID userId, String email, String rol, Instant expirationInstant) {
         return Jwts.builder()
                 .setSubject(userId.toString())

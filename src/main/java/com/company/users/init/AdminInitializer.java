@@ -3,24 +3,21 @@ package com.company.users.init;
 import com.company.users.crosscutting.Roles;
 import com.company.users.model.User;
 import com.company.users.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class AdminInitializer implements CommandLineRunner {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin.email}")
     private String adminEmail;
