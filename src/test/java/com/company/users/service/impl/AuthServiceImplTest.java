@@ -1,4 +1,4 @@
-package com.company.users.service;
+package com.company.users.service.impl;
 
 import com.company.users.configuration.JwtConfig;
 import com.company.users.dto.AuthTokens;
@@ -9,7 +9,6 @@ import com.company.users.model.RefreshToken;
 import com.company.users.model.User;
 import com.company.users.repository.RefreshTokenRepository;
 import com.company.users.repository.UserRepository;
-import com.company.users.service.impl.AuthServiceImpl;
 import com.company.users.utils.JwtUtils;
 import com.company.users.mapper.UserMapper;
 

@@ -1,4 +1,4 @@
-package com.company.users.service;
+package com.company.users.service.impl;
 
 import com.company.users.dto.UserRequestDTO;
 import com.company.users.dto.UserResponseDTO;
@@ -9,7 +9,6 @@ import com.company.users.factory.UserDataFactory;
 import com.company.users.mapper.UserMapper;
 import com.company.users.model.User;
 import com.company.users.repository.UserRepository;
-import com.company.users.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
