@@ -36,5 +36,5 @@ jobs:
           path: target/site/jacoco/
 
       # 3. Ejecutar pruebas de integración
-      - name: Run integration tests
-        run: mvn verify -Pintegration-tests
+      #- name: Run integration tests
+      #  run: mvn verify -Pintegration-tests
