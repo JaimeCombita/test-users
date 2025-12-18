@@ -41,13 +41,13 @@ spring:
     username: sa
     password:
   mail:
-    #host: smtp.office365.com
-    host: smtp.gmail.com
     port: 587
+    #host: smtp.office365.com
     #username: leonardo.102408@hotmail.com
-    #password: SamuGaby2008**
+    #password: mpqfmpejzmahgmbj
+    host: smtp.gmail.com
     username: leonardo.102408@gmail.com
-    password: SiFaSaGa820*.-.*
+    password: rndp sahj dkdn jpxs
     properties:
       mail:
         smtp:

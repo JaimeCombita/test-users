@@ -77,6 +77,7 @@ public class GlobalExceptionHandler {
         if (ex instanceof BadCredentialsException) return ErrorCode.INVALID_CREDENTIALS;
         if (ex instanceof AccessDeniedException) return ErrorCode.USER_NOT_ACTIVE;
         if (ex instanceof HttpMessageNotReadableException) return ErrorCode.MALFORMED_JSON;
+        if (ex instanceof RecoveryTokenException rte) return rte.getErrorCode();
         if (ex instanceof InvalidDataAccessApiUsageException) return ErrorCode.INVALID_DATA_ACCESS;
         return ErrorCode.INTERNAL_SERVER_ERROR;
     }

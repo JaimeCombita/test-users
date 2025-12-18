@@ -1,10 +1,7 @@
 package com.company.users.service;
 
 import com.company.users.crosscutting.Roles;
-import com.company.users.dto.ChangePasswordDTO;
-import com.company.users.dto.UserRequestDTO;
-import com.company.users.dto.UserResponseDTO;
-import com.company.users.dto.UserUpdateDTO;
+import com.company.users.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -35,8 +32,8 @@ public interface UserService {
 
     void changePassword(UUID id, ChangePasswordDTO changePasswordDTO);
 
-    void initiatePasswordRecovery(String email);
+    void resetPassword(String email);
 
-    void completePasswordRecovery(String token, String newPassword);
+    void recoveryPassword(RecoveryPasswordDTO recoveryPasswordDTO);
 
 }
