@@ -35,6 +35,13 @@ jobs:
           name: jacoco-report
           path: target/site/jacoco/
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: target/site/jacoco/jacoco.xml
+          fail_ci_if_error: true
+         # token: ${{ secrets.CODECOV_TOKEN }} # solo en repos privados
+
       # 3. Ejecutar pruebas de integración
       #- name: Run integration tests
       #  run: mvn verify -Pintegration-tests
