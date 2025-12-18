@@ -1,5 +1,10 @@
 # 🧑‍💻 Test Users API
 
+[![Build Status](https://github.com/JaimeCombita/test-users/actions/workflows/ci.yml/badge.svg)](https://github.com/JaimeCombita/test-users/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/JaimeCombita/test-users/branch/main/graph/badge.svg)](https://codecov.io/gh/JaimeCombita/test-users)
+![Java](https://img.shields.io/badge/Java-21-blue?logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3-brightgreen?logo=spring)
+
 Generic test project to implement a **CRUD de usuarios y teléfonos** usando **Spring Boot 3**, **Java 21**, y **H2 Database**.  
 Este proyecto sigue buenas prácticas de arquitectura en capas, DTOs de entrada/salida, validaciones y documentación con OpenAPI.
 
