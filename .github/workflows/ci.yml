@@ -2,9 +2,13 @@ name: Java CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]   # se ejecuta en cada push a main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]   # también en PRs hacia main
+    branches: [ "main" ]
+
+permissions:
+  id-token: write     # Necesario para OIDC
+  contents: read
 
 jobs:
   build:
@@ -40,8 +44,37 @@ jobs:
         with:
           files: target/site/jacoco/jacoco.xml
           fail_ci_if_error: true
-         # token: ${{ secrets.CODECOV_TOKEN }} # solo en repos privados
+          # token: ${{ secrets.CODECOV_TOKEN }} # solo en repos privados
 
-      # 3. Ejecutar pruebas de integración
-      #- name: Run integration tests
-      #  run: mvn verify -Pintegration-tests
+      # --- AUTENTICACIÓN CON GCP (Workload Identity Federation) ---
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/548662560064/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          service_account: "github-actions-sa@project-895cbe8c-c012-480d-878.iam.gserviceaccount.com"
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: project-895cbe8c-c012-480d-878
+
+      # --- BUILD & DEPLOY ---
+      - name: Build Docker image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA .
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Push Docker image
+        run: |
+          docker push us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy users-api \
+            --image us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated
