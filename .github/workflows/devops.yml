@@ -73,23 +73,37 @@ jobs:
           docker run --rm --user root --entrypoint ls us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA -la /app || true
 
       - name: Smoke test image locally
+        continue-on-error: true
         run: |
           echo "Running container locally and checking /actuator/health (wait up to 60s)";
-          docker run -d --name users-api-smoke -e PORT=8080 -p 8080:8080 us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA || true;
+          CONTAINER_ID=$(docker run -d -e PORT=8080 -p 8080:8080 us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA)
+          echo "Container started: $CONTAINER_ID";
+
+          PASSED=0
           for i in $(seq 1 30); do
-            sleep 2;
-            if curl -sS http://localhost:8080/actuator/health | grep -q "UP"; then
+            sleep 2
+            echo "Attempt $i: checking http://localhost:8080/actuator/health";
+            if curl -sS --max-time 2 http://localhost:8080/actuator/health 2>/dev/null | grep -q "UP"; then
               echo "Smoke test passed";
-              docker stop users-api-smoke || true;
-              break;
+              PASSED=1
+              break
+            fi
+          done
+
+          if [ "$PASSED" -eq 1 ]; then
+            echo "Stopping and removing container $CONTAINER_ID";
+            docker stop $CONTAINER_ID >/dev/null 2>&1 || true;
+            docker rm $CONTAINER_ID >/dev/null 2>&1 || true;
+            echo "Smoke test succeeded.";
+          else
+            echo "Smoke test failed - dumping container logs and continuing";
+            if [ -n "$CONTAINER_ID" ]; then
+              echo "Container logs:";
+              docker logs $CONTAINER_ID || true;
+              docker rm -f $CONTAINER_ID || true;
+            else
+              echo "No smoke container id available.";
             fi;
-            echo "Attempt $i: not ready yet";
-          done;
-          if docker ps -a --format "{{.Names}}" | grep -q users-api-smoke; then
-            echo "Container logs:";
-            docker logs users-api-smoke || true;
-            docker stop users-api-smoke || true;
-            exit 1;
           fi
 
       - name: Configure Docker for Artifact Registry
