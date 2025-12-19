@@ -1,4 +1,7 @@
+# Ignore build directory but allow packaged jar to be included in build context
 target/
+!target/*.jar
+
 .git
 .gitignore
 .vscode
