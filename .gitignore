@@ -47,6 +47,14 @@ Thumbs.db
 # Editors
 .vscode/
 
+# GitHub Copilot / Copilot for IDEs
+.copilot/
+.copilot.*
+*.copilot
+.idea/*copilot*
+.idea/**/copilot*
+.vscode/.copilot/
+
 # Maven wrapper
 .mvn/wrapper/maven-wrapper.jar
 mvnw
