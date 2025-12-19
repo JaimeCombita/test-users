@@ -17,5 +17,5 @@ EXPOSE 8080
 
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
-
+# Ensure the app binds to the port provided by the environment (Cloud Run sets PORT)
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar /app/app.jar"]

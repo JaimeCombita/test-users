@@ -32,6 +32,10 @@ jobs:
       - name: Run unit tests with JaCoCo
         run: mvn clean test jacoco:report
 
+      # Build artifact (package) so the JAR exists for Dockerfile
+      - name: Package application
+        run: mvn -DskipTests package
+
       # 2. Subir reporte de cobertura como artefacto
       - name: Upload JaCoCo report
         uses: actions/upload-artifact@v4
@@ -77,4 +81,5 @@ jobs:
             --image us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA \
             --region us-central1 \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --timeout 300s
