@@ -54,3 +54,7 @@ spring:
           auth: true
           starttls:
             enable: true
+
+# Ensure the application binds to the PORT provided by the environment (Cloud Run sets PORT)
+server:
+  port: ${PORT:8080}
