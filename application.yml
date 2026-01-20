@@ -29,23 +29,12 @@ management:
   tracing:
     enabled: false
     sampling:
-      probability: 1.0   # 100% de requests trazados (en producción puedes bajar este valor)
+      probability: 1.0
 
 spring:
-  h2:
-    console:
-      enabled: true
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
   mail:
-    #host: smtp.office365.com
     host: smtp.gmail.com
     port: 587
-    #username: leonardo.102408@hotmail.com
-    #password: SamuGaby2008**
     username: leonardo.102408@gmail.com
     password: SiFaSaGa820*.-.*
     properties:
