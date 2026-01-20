@@ -3,10 +3,7 @@ package com.company.users.service.impl;
 import com.company.users.crosscutting.ErrorCode;
 import com.company.users.crosscutting.ErrorMessage;
 import com.company.users.crosscutting.Roles;
-import com.company.users.dto.ChangePasswordDTO;
-import com.company.users.dto.UserRequestDTO;
-import com.company.users.dto.UserResponseDTO;
-import com.company.users.dto.UserUpdateDTO;
+import com.company.users.dto.*;
 import com.company.users.especifications.UserSpecifications;
 import com.company.users.exception.BadCredentialsException;
 import com.company.users.exception.BadResourceRequestException;
@@ -17,6 +14,7 @@ import com.company.users.model.PasswordRecoveryToken;
 import com.company.users.model.User;
 import com.company.users.repository.PasswordRecoveryTokenRepository;
 import com.company.users.repository.UserRepository;
+import com.company.users.service.EmailService;
 import com.company.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -40,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final PasswordRecoveryTokenRepository passwordRecoveryTokenRepository;
+    private final EmailService emailService;
 
     @Transactional
     @Override
@@ -136,7 +135,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void initiatePasswordRecovery(String email) {
+    public void resetPassword(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchResourceFoundException(ErrorMessage.USER_NOT_FOUND.getMessage()));
 
@@ -150,20 +149,20 @@ public class UserServiceImpl implements UserService {
                 .build();
         passwordRecoveryTokenRepository.save(tokenEntity);
 
-        //emailService.sendPasswordRecoveryEmail(user.getEmail(), recoveryToken);
+        emailService.sendPasswordRecoveryEmail(user.getEmail(), recoveryToken);
     }
 
     @Override
-    public void completePasswordRecovery(String token, String newPassword) {
-        PasswordRecoveryToken passwordRecoveryTokenEntity = passwordRecoveryTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RecoveryTokenException(ErrorCode.RECOVERY_TOKEN_NOT_FOUND.getMessage()));
+    public void recoveryPassword(RecoveryPasswordDTO recoveryPasswordDTO) {
+        PasswordRecoveryToken passwordRecoveryTokenEntity = passwordRecoveryTokenRepository.findByToken(recoveryPasswordDTO.token())
+                .orElseThrow(() -> new RecoveryTokenException(ErrorCode.RECOVERY_TOKEN_NOT_FOUND));
 
         if (passwordRecoveryTokenEntity.getIsUsed() || Instant.now().isAfter(passwordRecoveryTokenEntity.getExpirationDate())) {
-            throw new RecoveryTokenException(ErrorCode.RECOVERY_TOKEN_EXPIRED.getMessage());
+            throw new RecoveryTokenException(ErrorCode.RECOVERY_TOKEN_EXPIRED);
         }
 
         User user = passwordRecoveryTokenEntity.getUser();
-        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPassword(passwordEncoder.encode(recoveryPasswordDTO.newPassword()));
         userRepository.save(user);
 
         passwordRecoveryTokenEntity.setIsUsed(true);

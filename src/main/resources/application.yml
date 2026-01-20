@@ -29,9 +29,17 @@ management:
   tracing:
     enabled: false
     sampling:
-      probability: 1.0
+      probability: 1.0   # 100% de requests trazados (en producción puedes bajar este valor)
 
 spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
   mail:
     port: 587
     host: smtp.gmail.com
@@ -47,3 +55,4 @@ spring:
 # Ensure the application binds to the PORT provided by the environment (Cloud Run sets PORT)
 server:
   port: ${PORT:8080}
+

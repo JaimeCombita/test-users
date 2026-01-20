@@ -1,10 +1,7 @@
 package com.company.users.controller;
 
 import com.company.users.crosscutting.Roles;
-import com.company.users.dto.ChangePasswordDTO;
-import com.company.users.dto.UserRequestDTO;
-import com.company.users.dto.UserResponseDTO;
-import com.company.users.dto.UserUpdateDTO;
+import com.company.users.dto.*;
 import com.company.users.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -93,21 +90,17 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @PutMapping(INIT_RESET_PASSWORD)
-    public ResponseEntity<Void> initResetPassword(
-            @PathVariable("id") UUID id,
-            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
-        userService.changePassword(id, changePasswordDTO);
+    @PutMapping(RESET_PASSWORD)
+    public ResponseEntity<Void> resetPassword(
+            @RequestBody @Valid PasswordRecoveryRequest passwordRecoveryRequest) {
+        userService.resetPassword(passwordRecoveryRequest.email());
         return ResponseEntity.ok().build();
     }
 
-    @PreAuthorize("hasRole('USER')")
-    @PutMapping(COMPLETE_RESET_PASSWORD)
-    public ResponseEntity<Void> completeResetPassword(
-            @PathVariable("id") UUID id,
-            @RequestBody @Valid ChangePasswordDTO changePasswordDTO) {
-        userService.changePassword(id, changePasswordDTO);
+    @PutMapping(RECOVERY_PASSWORD)
+    public ResponseEntity<Void> recoveryPassword(
+            @RequestBody @Valid RecoveryPasswordDTO recoveryPasswordDTO) {
+        userService.recoveryPassword(recoveryPasswordDTO);
         return ResponseEntity.ok().build();
     }
 

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    // Use default empty value so placeholder resolution doesn't fail when property is missing
+    @Value("${spring.mail.username:}")
     private String from;
 
     @Override
@@ -26,7 +27,9 @@ public class EmailServiceImpl implements EmailService {
                 "Si no solicitaste este cambio, ignora este correo.";
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(from);
+        if (from != null && !from.isBlank()) {
+            message.setFrom(from);
+        }
         message.setTo(to);
         message.setSubject(subject);
         message.setText(text);

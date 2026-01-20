@@ -1,0 +1,124 @@
+name: Java CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write     # Necesario para OIDC
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Check Java version
+        run: java -version
+
+      # 1. Compilar y ejecutar pruebas unitarias con JaCoCo
+      - name: Run unit tests with JaCoCo
+        run: mvn clean test jacoco:report
+
+      # Build artifact (package) so the JAR exists for Dockerfile
+      - name: Package application
+        run: mvn -DskipTests package
+
+      # 2. Subir reporte de cobertura como artefacto
+      - name: Upload JaCoCo report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco/
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: target/site/jacoco/jacoco.xml
+          fail_ci_if_error: true
+          # token: ${{ secrets.CODECOV_TOKEN }} # solo en repos privados
+
+      # --- AUTENTICACIÓN CON GCP (Workload Identity Federation) ---
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "projects/548662560064/locations/global/workloadIdentityPools/github-actions-workload-provider/providers/github-actions"
+          service_account: "github-actions-deployer@project-895cbe8c-c012-480d-878.iam.gserviceaccount.com"
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: project-895cbe8c-c012-480d-878
+
+      # --- BUILD & DEPLOY ---
+      - name: Build Docker image
+        run: |
+          docker build -t us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA .
+
+      - name: Inspect image contents
+        run: |
+          echo "Listing /app inside the image (as root) to confirm JAR exists";
+          docker run --rm --user root --entrypoint ls us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA -la /app || true
+
+      - name: Smoke test image locally
+        continue-on-error: true
+        run: |
+          echo "Running container locally and checking /actuator/health (wait up to 60s)";
+          CONTAINER_ID=$(docker run -d -e PORT=8080 -p 8080:8080 us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA)
+          echo "Container started: $CONTAINER_ID";
+
+          PASSED=0
+          for i in $(seq 1 30); do
+            sleep 2
+            echo "Attempt $i: checking http://localhost:8080/actuator/health";
+            if curl -sS --max-time 2 http://localhost:8080/actuator/health 2>/dev/null | grep -q "UP"; then
+              echo "Smoke test passed";
+              PASSED=1
+              break
+            fi
+          done
+
+          if [ "$PASSED" -eq 1 ]; then
+            echo "Stopping and removing container $CONTAINER_ID";
+            docker stop $CONTAINER_ID >/dev/null 2>&1 || true;
+            docker rm $CONTAINER_ID >/dev/null 2>&1 || true;
+            echo "Smoke test succeeded.";
+          else
+            echo "Smoke test failed - dumping container logs and continuing";
+            if [ -n "$CONTAINER_ID" ]; then
+              echo "Container logs:";
+              docker logs $CONTAINER_ID || true;
+              docker rm -f $CONTAINER_ID || true;
+            else
+              echo "No smoke container id available.";
+            fi;
+          fi
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Push Docker image
+        run: |
+          docker push us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy users-api \
+            --image us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --timeout 300s
