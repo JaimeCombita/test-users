@@ -15,7 +15,10 @@ USER app
 
 EXPOSE 8080
 
+# Default JVM options
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
+# Default Spring profile (can be overridden at runtime)
+ENV SPRING_PROFILES_ACTIVE="dev"
 
 # Ensure the app binds to the port provided by the environment (Cloud Run sets PORT)
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dserver.port=${PORT:-8080} -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dserver.port=${PORT:-8080} -jar /app/app.jar"]

@@ -34,7 +34,7 @@ jobs:
 
       # Build artifact (package) so the JAR exists for Dockerfile
       - name: Package application
-        run: mvn -DskipTests package
+        run: mvn -DskipTests -Dspring.profiles.active=dev package
 
       # 2. Subir reporte de cobertura como artefacto
       - name: Upload JaCoCo report
@@ -76,7 +76,7 @@ jobs:
         continue-on-error: true
         run: |
           echo "Running container locally and checking /actuator/health (wait up to 60s)";
-          CONTAINER_ID=$(docker run -d -e PORT=8080 -p 8080:8080 us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA)
+          CONTAINER_ID=$(docker run -d -e PORT=8080 -e SPRING_PROFILES_ACTIVE=dev -p 8080:8080 us-central1-docker.pkg.dev/project-895cbe8c-c012-480d-878/users-api/users-api:$GITHUB_SHA);
           echo "Container started: $CONTAINER_ID";
 
           PASSED=0
@@ -121,4 +121,5 @@ jobs:
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
-            --timeout 300s
+            --timeout 300s \
+            --update-env-vars SPRING_PROFILES_ACTIVE=dev
